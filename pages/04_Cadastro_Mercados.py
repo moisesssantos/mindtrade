@@ -9,17 +9,17 @@ from sqlalchemy.exc import IntegrityError
 st.set_page_config(page_title="Cadastro de Mercados", layout="wide", page_icon="💹")
 
 # -----------------------------------------
-# TEMA CLARO + BOTÕES COLORIDOS + TÍTULO AJUSTADO
+# ESTILO VISUAL (Glassmorphism + Tema Claro)
 # -----------------------------------------
 st.markdown("""
     <style>
         /* Layout geral */
         body {
-            background-color: #FAFAFA;
+            background-color: #F4F7FA;
             color: #1C1C1C;
         }
         .stApp {
-            background-color: #FAFAFA;
+            background-color: #F4F7FA;
         }
 
         /* Títulos */
@@ -27,63 +27,69 @@ st.markdown("""
             color: #005B9F;
         }
         h1 {
-            font-size: 1.7rem !important;  /* título menor */
+            font-size: 2rem !important;
             font-weight: 700 !important;
             margin-bottom: 0.5rem !important;
         }
 
-        /* Botão padrão (Salvar, Atualizar, etc.) */
+        /* Botão principal (Salvar / Atualizar) com Glassmorphism */
         .stButton > button {
-            background-color: #007ACC;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5em 1em;
-            font-weight: bold;
-            transition: 0.2s;
+            background: rgba(0, 122, 204, 0.35) !important;
+            color: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 10px !important;
+            padding: 0.5em 1em !important;
+            font-weight: 600 !important;
+            font-size: 0.9em !important;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
         }
         .stButton > button:hover {
-            background-color: #005A99;
-            transform: scale(1.02);
+            background: rgba(0, 122, 204, 0.55) !important;
+            transform: translateY(-1px);
         }
 
-        /* Cartões e containers */
+        /* Cartões */
         .card {
-            background-color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.7);
             border-radius: 10px;
-            box-shadow: 0px 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
             padding: 1rem;
             margin-bottom: 10px;
+            backdrop-filter: blur(6px);
         }
 
-        /* Botões pequenos (Editar / Excluir) */
+        /* Botões pequenos da lista */
         div[data-testid="stButton"] > button[kind="secondary"],
         div[data-testid="stButton"] > button[kind="primary"] {
             padding: 0.25em 0.6em !important;
             font-size: 0.8em !important;
-            border-radius: 4px !important;
+            border-radius: 6px !important;
             margin: 0 3px !important;
             font-weight: 600 !important;
         }
 
-        /* Editar = Azul */
+        /* Editar = Azul translúcido */
         div[data-testid="stButton"]:has(span:contains("Editar")) > button {
-            background-color: #007ACC !important;
+            background: rgba(0, 122, 204, 0.35) !important;
             color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
         div[data-testid="stButton"]:has(span:contains("Editar")) > button:hover {
-            background-color: #005A99 !important;
+            background: rgba(0, 122, 204, 0.55) !important;
         }
 
-        /* Excluir = Vermelho */
+        /* Excluir = Vermelho translúcido */
         div[data-testid="stButton"]:has(span:contains("Excluir")) > button,
         div[data-testid="stButton"]:has(span:contains("Remover")) > button {
-            background-color: #D9534F !important;
+            background: rgba(217, 83, 79, 0.35) !important;
             color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
         div[data-testid="stButton"]:has(span:contains("Excluir")) > button:hover,
         div[data-testid="stButton"]:has(span:contains("Remover")) > button:hover {
-            background-color: #B52B27 !important;
+            background: rgba(217, 83, 79, 0.55) !important;
         }
     </style>
 """, unsafe_allow_html=True)
