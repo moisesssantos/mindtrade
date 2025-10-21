@@ -91,7 +91,7 @@ engine = create_engine(
 # TÍTULO E DESCRIÇÃO
 # -----------------------------------------
 st.title("🎯 Cadastro de Estratégias")
-st.markdown("Gerencie as estratégias de trading e associe cada uma a um mercado padrão.")
+st.markdown("Gerencie as estratégias de trading e associe cada uma a um mercado padrão e nível de risco.")
 
 st.divider()
 
@@ -118,6 +118,8 @@ if "edit_desc" not in st.session_state:
     st.session_state.edit_desc = ""
 if "edit_mercado" not in st.session_state:
     st.session_state.edit_mercado = ""
+if "edit_risco" not in st.session_state:
+    st.session_state.edit_risco = ""
 
 # -----------------------------------------
 # FORMULÁRIO
@@ -127,6 +129,12 @@ st.subheader("➕ Adicionar / ✏️ Editar Estratégia")
 with st.form("form_estrategias", clear_on_submit=False):
     nome = st.text_input("Nome da estratégia", value=st.session_state.edit_nome)
     descricao = st.text_area("Descrição (opcional)", value=st.session_state.edit_desc, height=80)
+    risco = st.selectbox(
+        "Nível de risco",
+        ["Baixo", "Médio", "Alto"],
+        index=["Baixo", "Médio", "Alto"].index(st.session_state.edit_risco)
+        if st.session_state.edit_risco in ["Baixo", "Médio", "Alto"] else 1
+    )
     mercado_sel = st.selectbox(
         "Mercado padrão",
         options=lista_mercados if lista_mercados else ["Nenhum mercado disponível"],
@@ -149,16 +157,23 @@ with st.form("form_estrategias", clear_on_submit=False):
                     if st.session_state.edit_id == "":
                         with engine.connect() as conn:
                             conn.execute(
-                                text("INSERT INTO estrategias (nome, descricao, id_mercado) VALUES (:nome, :descricao, :id_mercado)"),
-                                {"nome": nome, "descricao": descricao, "id_mercado": id_mercado},
+                                text("""
+                                    INSERT INTO estrategias (nome, descricao, id_mercado, risco)
+                                    VALUES (:nome, :descricao, :id_mercado, :risco)
+                                """),
+                                {"nome": nome, "descricao": descricao, "id_mercado": id_mercado, "risco": risco},
                             )
                             conn.commit()
                         st.success(f"✅ Estratégia '{nome}' adicionada com sucesso!")
                     else:
                         with engine.connect() as conn:
                             conn.execute(
-                                text("UPDATE estrategias SET nome = :nome, descricao = :descricao, id_mercado = :id_mercado WHERE id = :id"),
-                                {"nome": nome, "descricao": descricao, "id_mercado": id_mercado, "id": st.session_state.edit_id},
+                                text("""
+                                    UPDATE estrategias
+                                    SET nome = :nome, descricao = :descricao, id_mercado = :id_mercado, risco = :risco
+                                    WHERE id = :id
+                                """),
+                                {"nome": nome, "descricao": descricao, "id_mercado": id_mercado, "risco": risco, "id": st.session_state.edit_id},
                             )
                             conn.commit()
                         st.success(f"✏️ Estratégia '{nome}' atualizada com sucesso!")
@@ -167,6 +182,7 @@ with st.form("form_estrategias", clear_on_submit=False):
                     st.session_state.edit_nome = ""
                     st.session_state.edit_desc = ""
                     st.session_state.edit_mercado = ""
+                    st.session_state.edit_risco = ""
                     st.rerun()
             except IntegrityError:
                 st.warning(f"⚠️ A estratégia '{nome}' já está cadastrada.")
@@ -182,7 +198,7 @@ st.subheader("📋 Lista de Estratégias")
 
 try:
     df = pd.read_sql("""
-        SELECT e.id, e.nome AS estrategia, e.descricao, m.nome AS mercado
+        SELECT e.id, e.nome AS estrategia, e.descricao, e.risco, m.nome AS mercado
         FROM estrategias e
         LEFT JOIN mercados m ON e.id_mercado = m.id
         ORDER BY e.nome;
@@ -191,20 +207,22 @@ try:
     if not df.empty:
         for _, row in df.iterrows():
             with st.container():
-                col1, col2, col3, col4, col5, col6 = st.columns([0.4, 2.5, 3, 2, 0.8, 0.8])
+                col1, col2, col3, col4, col5, col6, col7 = st.columns([0.4, 2, 2.5, 2, 1.2, 0.8, 0.8])
                 col1.markdown(f"**{row['id']}**")
                 col2.markdown(f"🎯 **{row['estrategia']}**")
                 col3.markdown(f"{row['descricao'] if row['descricao'] else '—'}")
                 col4.markdown(f"💹 {row['mercado'] if row['mercado'] else '—'}")
+                col5.markdown(f"⚠️ **{row['risco'] if row['risco'] else '—'}**")
 
-                if col5.button("✏️ Editar", key=f"edit_{row['id']}"):
+                if col6.button("✏️ Editar", key=f"edit_{row['id']}"):
                     st.session_state.edit_id = row["id"]
                     st.session_state.edit_nome = row["estrategia"]
                     st.session_state.edit_desc = row["descricao"] or ""
                     st.session_state.edit_mercado = row["mercado"] or ""
+                    st.session_state.edit_risco = row["risco"] or "Médio"
                     st.rerun()
 
-                if col6.button("🗑️ Excluir", key=f"del_{row['id']}"):
+                if col7.button("🗑️ Excluir", key=f"del_{row['id']}"):
                     with engine.connect() as conn:
                         conn.execute(text("DELETE FROM estrategias WHERE id = :id"), {"id": row["id"]})
                         conn.commit()
