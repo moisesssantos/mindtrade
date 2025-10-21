@@ -17,21 +17,38 @@ with st.form("form_paises"):
     enviar = st.form_submit_button("Salvar / Atualizar")
 
     if enviar:
-        if nome.strip() == "":
-            st.warning("⚠️ Digite o nome do país antes de salvar.")
-        else:
-            try:
-                with engine.begin() as conn:
-                    if id_editar.strip() == "":
-                        conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
-                        st.success(f"✅ País '{nome}' adicionado com sucesso!")
-                    else:
-                        conn.execute(text("UPDATE paises SET nome = :nome WHERE id = :id"), {"nome": nome, "id": id_editar})
-                        st.success(f"✏️ País ID {id_editar} atualizado para '{nome}'!")
-            except IntegrityError:
-                st.warning(f"⚠️ O país '{nome}' já está cadastrado.")
-            except Exception as e:
-                st.error(f"❌ Erro: {e}")
+    if nome.strip() == "":
+        st.warning("⚠️ Informe o nome da competição.")
+    elif pais_selecionado not in mapa_paises:
+        st.error("❌ País inválido. Atualize a página e tente novamente.")
+    else:
+        try:
+            with engine.begin() as conn:
+                id_pais = mapa_paises[pais_selecionado]
+
+                if st.session_state.edit_id == "":
+                    conn.execute(
+                        text("INSERT INTO competicoes (nome, id_pais) VALUES (:nome, :id_pais)"),
+                        {"nome": nome, "id_pais": id_pais},
+                    )
+                    st.success(f"✅ Competição '{nome}' adicionada com sucesso!")
+                else:
+                    conn.execute(
+                        text("UPDATE competicoes SET nome = :nome, id_pais = :id_pais WHERE id = :id"),
+                        {"nome": nome, "id_pais": id_pais, "id": st.session_state.edit_id},
+                    )
+                    st.success(f"✏️ Competição '{nome}' atualizada com sucesso!")
+
+                # limpar estado após salvar
+                st.session_state.edit_id = ""
+                st.session_state.edit_nome = ""
+                st.session_state.edit_pais = ""
+                st.rerun()
+
+        except IntegrityError:
+            st.warning(f"⚠️ A competição '{nome}' já está cadastrada nesse país.")
+        except Exception as e:
+            st.error(f"❌ Erro ao salvar: {e}")
 
 st.divider()
 st.subheader("📋 Lista de Países Cadastrados")
