@@ -4,6 +4,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sqlalchemy import create_engine
 
+# ========================
+# MENU LATERAL (SIDEBAR)
+# ========================
+st.sidebar.image(
+    "https://cdn-icons-png.flaticon.com/512/174/174876.png",
+    width=60,
+)
+st.sidebar.markdown("<h2 style='color:#005B9F;'>MindTrade</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+
+pagina = st.sidebar.radio(
+    "📚 Selecione uma seção:",
+    [
+        "🏁 Início",
+        "🌎 Países",
+        "🏆 Competições",
+        "⚽ Equipes",
+        "💹 Mercados",
+        "🎯 Estratégias",
+        "📊 Pré-Análise",
+        "💼 Entradas",
+        "📈 Relatórios"
+    ],
+    label_visibility="collapsed"
+)
+st.sidebar.markdown("---")
+st.sidebar.markdown("💻 <small>Desenvolvido por Moisés</small>", unsafe_allow_html=True)
+
 # -----------------------------------------
 # CONFIGURAÇÃO INICIAL
 # -----------------------------------------
