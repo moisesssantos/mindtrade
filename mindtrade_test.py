@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 
 # -----------------------------------------
 # CONFIGURAÇÕES INICIAIS
@@ -27,8 +28,10 @@ with st.form("form_paises"):
         else:
             try:
                 with engine.begin() as conn:
-                    conn.execute(f"INSERT INTO paises (nome) VALUES ('{nome}')")
+                    conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
                 st.success(f"✅ País '{nome}' adicionado com sucesso!")
+            except IntegrityError:
+                st.warning(f"⚠️ O país '{nome}' já está cadastrado.")
             except Exception as e:
                 st.error(f"❌ Erro ao inserir: {e}")
 
@@ -43,3 +46,4 @@ try:
     st.dataframe(df, use_container_width=True)
 except Exception as e:
     st.error(f"❌ Erro ao carregar países: {e}")
+
