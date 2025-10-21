@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 # -----------------------------------------
 st.set_page_config(page_title="Cadastro de Países", layout="wide", page_icon="🌍")
 
-# Tema claro no estilo "Seattle Weather"
+# Tema claro no estilo Seattle Weather
 st.markdown("""
     <style>
         body {
@@ -45,7 +45,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------
-# CONEXÃO COM O BANCO DE DADOS
+# CONEXÃO COM O BANCO
 # -----------------------------------------
 engine = create_engine(
     "postgresql://neondb_owner:npg_xdZKq5FRT8Wn@ep-dry-wind-adh6ysjv-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
@@ -78,24 +78,23 @@ with st.form("form_paises", clear_on_submit=False):
             st.warning("⚠️ Informe o nome do país.")
         else:
             try:
-                with engine.begin() as conn:
-                    if st.session_state.edit_id == "":
-                        conn.execute(
-                            text("INSERT INTO paises (nome) VALUES (:nome)"),
-                            {"nome": nome},
-                        )
-                        st.success(f"✅ País '{nome}' adicionado com sucesso!")
-                    else:
+                if st.session_state.edit_id == "":
+                    with engine.connect() as conn:
+                        conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
+                        conn.commit()
+                    st.success(f"✅ País '{nome}' adicionado com sucesso!")
+                else:
+                    with engine.connect() as conn:
                         conn.execute(
                             text("UPDATE paises SET nome = :nome WHERE id = :id"),
                             {"nome": nome, "id": st.session_state.edit_id},
                         )
-                        st.success(f"✏️ País '{nome}' atualizado com sucesso!")
+                        conn.commit()
+                    st.success(f"✏️ País '{nome}' atualizado com sucesso!")
 
-                    # limpar sessão após salvar
-                    st.session_state.edit_id = ""
-                    st.session_state.edit_nome = ""
-                    st.rerun()
+                st.session_state.edit_id = ""
+                st.session_state.edit_nome = ""
+                st.rerun()
 
             except IntegrityError:
                 st.warning(f"⚠️ O país '{nome}' já está cadastrado.")
@@ -122,8 +121,9 @@ try:
                     st.session_state.edit_nome = row["nome"]
                     st.rerun()
                 if col4.button("🗑️ Excluir", key=f"del_{row['id']}"):
-                    with engine.begin() as conn:
+                    with engine.connect() as conn:
                         conn.execute(text("DELETE FROM paises WHERE id = :id"), {"id": row["id"]})
+                        conn.commit()
                     st.success(f"🗑️ País '{row['nome']}' removido com sucesso!")
                     st.rerun()
     else:
