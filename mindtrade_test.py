@@ -1,135 +1,67 @@
 import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import IntegrityError
+import numpy as np
+import matplotlib.pyplot as plt
+from sqlalchemy import create_engine
 
 # -----------------------------------------
-# CONFIGURAÇÕES INICIAIS
+# CONFIGURAÇÃO INICIAL
 # -----------------------------------------
-st.set_page_config(
-    page_title="MindTrade - Países",
-    page_icon="🌍",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="MindTrade - Dashboard", layout="wide", page_icon="☁️")
 
-# Tema escuro customizado (inspirado em Stock Peer Analysis)
-st.markdown(
-    """
-    <style>
-        body {
-            background-color: #0E1117;
-            color: #FAFAFA;
-        }
-        .stApp {
-            background-color: #0E1117;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: #00C0F3;
-        }
-        .css-1d391kg {
-            background-color: #0E1117;
-        }
-        .stDataFrame {
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 10px;
-            background-color: #1E222A;
-        }
-        .stButton > button {
-            background-color: #00C0F3;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5em 1em;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .stButton > button:hover {
-            background-color: #008FB5;
-            transform: scale(1.02);
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.title("☁️ MindTrade - Visão de Operações (Estilo Seattle Weather)")
 
-# -----------------------------------------
-# CONEXÃO COM O BANCO
-# -----------------------------------------
+# Conexão com o banco Neon
 engine = create_engine(
     "postgresql://neondb_owner:npg_xdZKq5FRT8Wn@ep-dry-wind-adh6ysjv-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 )
 
 # -----------------------------------------
-# CABEÇALHO
+# SIMULAÇÃO DE DADOS (você trocará depois pelos reais)
 # -----------------------------------------
-col1, col2 = st.columns([0.8, 0.2])
-with col1:
-    st.title("🌍 Painel de Países")
-    st.markdown("Gerencie os países cadastrados no sistema MindTrade com design inspirado em *Stock Peer Analysis*.")
-with col2:
-    st.image(
-        "https://cdn-icons-png.flaticon.com/512/2382/2382461.png",
-        width=80,
-    )
+np.random.seed(42)
+dias = pd.date_range("2025-01-01", periods=30)
+lucros = np.random.normal(0, 100, 30).cumsum() + 1000
+greens = np.random.randint(0, 10, 30)
+reds = np.random.randint(0, 10, 30)
 
-st.divider()
+df = pd.DataFrame({"Data": dias, "Lucro_Acumulado": lucros, "Greens": greens, "Reds": reds})
 
 # -----------------------------------------
-# FORMULÁRIO DE CADASTRO / EDIÇÃO
+# LAYOUT DE DESTAQUES
 # -----------------------------------------
-with st.container():
-    st.subheader("➕ Adicionar / ✏️ Editar País")
+col1, col2, col3 = st.columns(3)
+col1.metric("💰 Lucro Total", f"R$ {df['Lucro_Acumulado'].iloc[-1]:.2f}")
+col2.metric("✅ Greens", df["Greens"].sum())
+col3.metric("❌ Reds", df["Reds"].sum())
 
-    with st.form("form_paises", clear_on_submit=True):
-        nome = st.text_input("Nome do país")
-        id_editar = st.text_input("ID (para editar país existente)", "")
-        enviar = st.form_submit_button("Salvar / Atualizar")
-
-        if enviar:
-            if nome.strip() == "":
-                st.warning("⚠️ Digite o nome do país antes de salvar.")
-            else:
-                try:
-                    with engine.begin() as conn:
-                        if id_editar.strip() == "":
-                            conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
-                            st.success(f"✅ País '{nome}' adicionado com sucesso!")
-                        else:
-                            conn.execute(text("UPDATE paises SET nome = :nome WHERE id = :id"), {"nome": nome, "id": id_editar})
-                            st.success(f"✏️ País ID {id_editar} atualizado para '{nome}'!")
-                except IntegrityError:
-                    st.warning(f"⚠️ O país '{nome}' já está cadastrado.")
-                except Exception as e:
-                    st.error(f"❌ Erro: {e}")
-
-st.divider()
+st.markdown("---")
 
 # -----------------------------------------
-# LISTA DE PAÍSES
+# GRÁFICO PRINCIPAL
 # -----------------------------------------
-st.subheader("📋 Lista de Países Cadastrados")
+st.subheader("📈 Evolução do Lucro Acumulado")
 
-try:
-    df = pd.read_sql("SELECT * FROM paises ORDER BY id;", engine)
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(df["Data"], df["Lucro_Acumulado"], color="#1f77b4", linewidth=2.5)
+ax.set_facecolor("#f5f5f5")
+ax.grid(True, linestyle="--", alpha=0.6)
+ax.set_xlabel("Data")
+ax.set_ylabel("Lucro (R$)")
+st.pyplot(fig)
 
-    if not df.empty:
-        for _, row in df.iterrows():
-            with st.container():
-                c1, c2, c3 = st.columns([0.2, 0.6, 0.2])
-                c1.markdown(f"**🆔 {row['id']}**")
-                c2.markdown(f"**{row['nome']}**")
-                if c3.button("🗑️ Excluir", key=f"del_{row['id']}"):
-                    with engine.begin() as conn:
-                        conn.execute(text("DELETE FROM paises WHERE id = :id"), {"id": row['id']})
-                    st.success(f"🗑️ País '{row['nome']}' removido com sucesso!")
-                    st.rerun()
-    else:
-        st.info("Nenhum país cadastrado ainda.")
-except Exception as e:
-    st.error(f"❌ Erro ao carregar países: {e}")
+# -----------------------------------------
+# SEGUNDO GRÁFICO
+# -----------------------------------------
+st.subheader("📊 Comparativo de Greens e Reds")
+fig2, ax2 = plt.subplots(figsize=(10, 4))
+ax2.bar(df["Data"], df["Greens"], color="#2ca02c", alpha=0.7, label="Greens")
+ax2.bar(df["Data"], -df["Reds"], color="#d62728", alpha=0.7, label="Reds")
+ax2.legend()
+ax2.set_xlabel("Data")
+ax2.set_ylabel("Quantidade")
+ax2.grid(True, linestyle="--", alpha=0.6)
+st.pyplot(fig2)
 
-st.divider()
-
-st.caption("💡 MindTrade © 2025 — Interface adaptada do modelo *Stock Peer Analysis* para o seu sistema de trading.")
+st.markdown("---")
+st.caption("💡 Visual inspirado em 'Seattle Weather' da Streamlit Gallery. Adaptado para o MindTrade © 2025.")
