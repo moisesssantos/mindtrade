@@ -15,11 +15,11 @@ st.markdown("""
     <style>
         /* Layout geral */
         body {
-            background-color: #F4F7FA;
+            background-color: #FFFFFF;
             color: #1C1C1C;
         }
         .stApp {
-            background-color: #F4F7FA;
+            background-color: #FFFFFF;
         }
 
         /* Títulos */
@@ -27,69 +27,70 @@ st.markdown("""
             color: #005B9F;
         }
         h1 {
-            font-size: 2rem !important;
+            font-size: 2.2rem !important;
             font-weight: 700 !important;
-            margin-bottom: 0.5rem !important;
+            margin-bottom: 0.6rem !important;
         }
 
-        /* Botão principal (Salvar / Atualizar) com Glassmorphism */
+        /* Botão principal (Salvar / Atualizar) */
         .stButton > button {
-            background: rgba(0, 122, 204, 0.35) !important;
-            color: #FFFFFF !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            border-radius: 10px !important;
+            background: rgba(0, 122, 204, 0.15) !important;
+            color: #005A99 !important;
+            border: 1px solid rgba(0, 122, 204, 0.4) !important;
+            border-radius: 8px !important;
             padding: 0.5em 1em !important;
             font-weight: 600 !important;
             font-size: 0.9em !important;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease-in-out;
         }
         .stButton > button:hover {
-            background: rgba(0, 122, 204, 0.55) !important;
+            background: rgba(0, 122, 204, 0.25) !important;
+            color: #004777 !important;
             transform: translateY(-1px);
         }
 
         /* Cartões */
         .card {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(250, 250, 250, 0.85);
             border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
             padding: 1rem;
             margin-bottom: 10px;
-            backdrop-filter: blur(6px);
+            border: 1px solid #E5E5E5;
         }
 
         /* Botões pequenos da lista */
         div[data-testid="stButton"] > button[kind="secondary"],
         div[data-testid="stButton"] > button[kind="primary"] {
-            padding: 0.25em 0.6em !important;
-            font-size: 0.8em !important;
+            padding: 0.3em 0.7em !important;
+            font-size: 0.85em !important;
             border-radius: 6px !important;
             margin: 0 3px !important;
             font-weight: 600 !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
 
         /* Editar = Azul translúcido */
         div[data-testid="stButton"]:has(span:contains("Editar")) > button {
-            background: rgba(0, 122, 204, 0.35) !important;
-            color: white !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(0, 122, 204, 0.15) !important;
+            color: #004777 !important;
         }
         div[data-testid="stButton"]:has(span:contains("Editar")) > button:hover {
-            background: rgba(0, 122, 204, 0.55) !important;
+            background: rgba(0, 122, 204, 0.25) !important;
         }
 
         /* Excluir = Vermelho translúcido */
         div[data-testid="stButton"]:has(span:contains("Excluir")) > button,
         div[data-testid="stButton"]:has(span:contains("Remover")) > button {
-            background: rgba(217, 83, 79, 0.35) !important;
-            color: white !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(217, 83, 79, 0.15) !important;
+            color: #7A1412 !important;
         }
         div[data-testid="stButton"]:has(span:contains("Excluir")) > button:hover,
         div[data-testid="stButton"]:has(span:contains("Remover")) > button:hover {
-            background: rgba(217, 83, 79, 0.55) !important;
+            background: rgba(217, 83, 79, 0.25) !important;
         }
     </style>
 """, unsafe_allow_html=True)
