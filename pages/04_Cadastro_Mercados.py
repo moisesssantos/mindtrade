@@ -8,9 +8,10 @@ from sqlalchemy.exc import IntegrityError
 # -----------------------------------------
 st.set_page_config(page_title="Cadastro de Mercados", layout="wide", page_icon="💹")
 
-# Tema claro estilo Seattle Weather
+# Tema claro estilo Seattle Weather com botões compactos e coloridos
 st.markdown("""
     <style>
+        /* Layout geral */
         body {
             background-color: #FAFAFA;
             color: #1C1C1C;
@@ -18,9 +19,13 @@ st.markdown("""
         .stApp {
             background-color: #FAFAFA;
         }
+
+        /* Títulos */
         h1, h2, h3 {
             color: #005B9F;
         }
+
+        /* Botão padrão (como o de salvar no formulário) */
         .stButton > button {
             background-color: #007ACC;
             color: white;
@@ -34,12 +39,44 @@ st.markdown("""
             background-color: #005A99;
             transform: scale(1.02);
         }
+
+        /* Cartões e containers */
         .card {
             background-color: #FFFFFF;
             border-radius: 10px;
             box-shadow: 0px 1px 4px rgba(0,0,0,0.1);
             padding: 1rem;
             margin-bottom: 10px;
+        }
+
+        /* Botões pequenos para ações da lista (Editar / Excluir) */
+        div[data-testid="stButton"] > button[kind="secondary"],
+        div[data-testid="stButton"] > button[kind="primary"] {
+            padding: 0.25em 0.6em;
+            font-size: 0.85em;
+            border-radius: 4px;
+            margin: 0 3px;
+            font-weight: 600;
+        }
+
+        /* Editar = Azul */
+        div[data-testid="stButton"] > button:has(span:contains("Editar")) {
+            background-color: #007ACC !important;
+            color: white !important;
+        }
+        div[data-testid="stButton"] > button:has(span:contains("Editar")):hover {
+            background-color: #005A99 !important;
+        }
+
+        /* Excluir = Vermelho */
+        div[data-testid="stButton"] > button:has(span:contains("Excluir")),
+        div[data-testid="stButton"] > button:has(span:contains("Remover")) {
+            background-color: #D9534F !important;
+            color: white !important;
+        }
+        div[data-testid="stButton"] > button:has(span:contains("Excluir")):hover,
+        div[data-testid="stButton"] > button:has(span:contains("Remover")):hover {
+            background-color: #B52B27 !important;
         }
     </style>
 """, unsafe_allow_html=True)
