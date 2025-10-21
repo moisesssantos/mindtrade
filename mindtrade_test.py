@@ -16,11 +16,12 @@ engine = create_engine(
 st.title("🌍 Cadastro de Países")
 
 # -----------------------------------------
-# FORMULÁRIO DE CADASTRO
+# FORMULÁRIO DE CADASTRO / EDIÇÃO
 # -----------------------------------------
 with st.form("form_paises"):
     nome = st.text_input("Nome do país")
-    enviar = st.form_submit_button("Salvar País")
+    id_editar = st.text_input("ID (para editar um país existente)", "")
+    enviar = st.form_submit_button("Salvar / Atualizar")
 
     if enviar:
         if nome.strip() == "":
@@ -28,22 +29,36 @@ with st.form("form_paises"):
         else:
             try:
                 with engine.begin() as conn:
-                    conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
-                st.success(f"✅ País '{nome}' adicionado com sucesso!")
+                    if id_editar.strip() == "":
+                        conn.execute(text("INSERT INTO paises (nome) VALUES (:nome)"), {"nome": nome})
+                        st.success(f"✅ País '{nome}' adicionado com sucesso!")
+                    else:
+                        conn.execute(text("UPDATE paises SET nome = :nome WHERE id = :id"), {"nome": nome, "id": id_editar})
+                        st.success(f"✏️ País ID {id_editar} atualizado para '{nome}'!")
             except IntegrityError:
                 st.warning(f"⚠️ O país '{nome}' já está cadastrado.")
             except Exception as e:
-                st.error(f"❌ Erro ao inserir: {e}")
+                st.error(f"❌ Erro: {e}")
 
 # -----------------------------------------
-# EXIBIR TABELA DE PAÍSES
+# LISTA E EXCLUSÃO
 # -----------------------------------------
 st.divider()
 st.subheader("📋 Lista de Países Cadastrados")
 
 try:
     df = pd.read_sql("SELECT * FROM paises ORDER BY id;", engine)
-    st.dataframe(df, use_container_width=True)
+    if not df.empty:
+        for index, row in df.iterrows():
+            col1, col2, col3 = st.columns([1, 4, 1])
+            col1.write(f"**{row['id']}**")
+            col2.write(row['nome'])
+            if col3.button("🗑️ Excluir", key=f"del_{row['id']}"):
+                with engine.begin() as conn:
+                    conn.execute(text("DELETE FROM paises WHERE id = :id"), {"id": row['id']})
+                st.success(f"🗑️ País '{row['nome']}' removido com sucesso!")
+                st.rerun()
+    else:
+        st.info("Nenhum país cadastrado ainda.")
 except Exception as e:
     st.error(f"❌ Erro ao carregar países: {e}")
-
