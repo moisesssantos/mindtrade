@@ -4,36 +4,41 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
 # -----------------------------------------
-# CONFIGURAÇÃO GERAL
+# CONFIGURAÇÃO INICIAL
 # -----------------------------------------
 st.set_page_config(page_title="Cadastro de Competições", layout="wide", page_icon="🏆")
 
-# Tema escuro visual
+# Tema claro estilo Seattle Weather
 st.markdown("""
     <style>
         body {
-            background-color: #0E1117;
-            color: #FAFAFA;
+            background-color: #FAFAFA;
+            color: #1C1C1C;
         }
-        .stApp { background-color: #0E1117; }
-        h1, h2, h3 { color: #00C0F3; }
+        .stApp {
+            background-color: #FAFAFA;
+        }
+        h1, h2, h3 {
+            color: #005B9F;
+        }
         .stButton > button {
-            background-color: #00C0F3;
+            background-color: #007ACC;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 0.5em 1em;
             font-weight: bold;
             transition: 0.2s;
         }
         .stButton > button:hover {
-            background-color: #008FB5;
-            transform: scale(1.05);
+            background-color: #005A99;
+            transform: scale(1.02);
         }
         .card {
-            background-color: #1E222A;
-            border-radius: 12px;
-            padding: 10px;
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0px 1px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
             margin-bottom: 10px;
         }
     </style>
@@ -47,7 +52,7 @@ engine = create_engine(
 )
 
 st.title("🏆 Cadastro de Competições")
-st.markdown("Gerencie as competições e relacione-as com seus países correspondentes.")
+st.markdown("Gerencie as competições e vincule-as aos países cadastrados.")
 
 st.divider()
 
@@ -59,12 +64,12 @@ try:
     lista_paises = df_paises["nome"].tolist()
     mapa_paises = dict(zip(df_paises["nome"], df_paises["id"]))
 except Exception as e:
-    st.error(f"Erro ao carregar países: {e}")
+    st.error(f"❌ Erro ao carregar países: {e}")
     lista_paises = []
     mapa_paises = {}
 
 # -----------------------------------------
-# ESTADO LOCAL (para edição)
+# ESTADO LOCAL (edição)
 # -----------------------------------------
 if "edit_id" not in st.session_state:
     st.session_state.edit_id = ""
@@ -82,32 +87,41 @@ with st.form("form_competicoes", clear_on_submit=False):
     nome = st.text_input("Nome da competição", value=st.session_state.edit_nome)
     pais_selecionado = st.selectbox(
         "País",
-        lista_paises,
+        options=lista_paises if lista_paises else ["Nenhum país disponível"],
         index=lista_paises.index(st.session_state.edit_pais)
         if st.session_state.edit_pais in lista_paises else 0
     )
     enviar = st.form_submit_button("Salvar / Atualizar")
 
     if enviar:
-        if nome.strip() == "":
+        if not lista_paises:
+            st.error("❌ Nenhum país cadastrado. Cadastre um país primeiro.")
+        elif nome.strip() == "":
             st.warning("⚠️ Informe o nome da competição.")
         else:
             try:
-                with engine.begin() as conn:
+                id_pais = mapa_paises.get(pais_selecionado)
+                if not id_pais:
+                    st.error("❌ País inválido. Atualize a página e tente novamente.")
+                else:
                     if st.session_state.edit_id == "":
-                        conn.execute(
-                            text("INSERT INTO competicoes (nome, id_pais) VALUES (:nome, :id_pais)"),
-                            {"nome": nome, "id_pais": mapa_paises[pais_selecionado]},
-                        )
+                        with engine.connect() as conn:
+                            conn.execute(
+                                text("INSERT INTO competicoes (nome, id_pais) VALUES (:nome, :id_pais)"),
+                                {"nome": nome, "id_pais": id_pais},
+                            )
+                            conn.commit()
                         st.success(f"✅ Competição '{nome}' adicionada com sucesso!")
                     else:
-                        conn.execute(
-                            text("UPDATE competicoes SET nome = :nome, id_pais = :id_pais WHERE id = :id"),
-                            {"nome": nome, "id_pais": mapa_paises[pais_selecionado], "id": st.session_state.edit_id},
-                        )
+                        with engine.connect() as conn:
+                            conn.execute(
+                                text("UPDATE competicoes SET nome = :nome, id_pais = :id_pais WHERE id = :id"),
+                                {"nome": nome, "id_pais": id_pais, "id": st.session_state.edit_id},
+                            )
+                            conn.commit()
                         st.success(f"✏️ Competição '{nome}' atualizada com sucesso!")
 
-                    # limpar estado após salvar
+                    # limpar campos e atualizar
                     st.session_state.edit_id = ""
                     st.session_state.edit_nome = ""
                     st.session_state.edit_pais = ""
@@ -116,7 +130,7 @@ with st.form("form_competicoes", clear_on_submit=False):
             except IntegrityError:
                 st.warning(f"⚠️ A competição '{nome}' já está cadastrada nesse país.")
             except Exception as e:
-                st.error(f"❌ Erro: {e}")
+                st.error(f"❌ Erro ao salvar: {e}")
 
 st.divider()
 
@@ -135,22 +149,24 @@ try:
 
     if not df.empty:
         for _, row in df.iterrows():
-            col1, col2, col3, col4, col5 = st.columns([0.5, 3, 2, 1, 1])
-            col1.markdown(f"**{row['id']}**")
-            col2.markdown(f"🏆 {row['competencia']}")
-            col3.markdown(f"🌍 {row['pais']}")
+            with st.container():
+                col1, col2, col3, col4, col5 = st.columns([0.5, 3, 2, 1, 1])
+                col1.markdown(f"**{row['id']}**")
+                col2.markdown(f"🏆 {row['competencia']}")
+                col3.markdown(f"🌍 {row['pais']}")
 
-            if col4.button("✏️ Editar", key=f"edit_{row['id']}"):
-                st.session_state.edit_id = row["id"]
-                st.session_state.edit_nome = row["competencia"]
-                st.session_state.edit_pais = row["pais"]
-                st.rerun()
+                if col4.button("✏️ Editar", key=f"edit_{row['id']}"):
+                    st.session_state.edit_id = row["id"]
+                    st.session_state.edit_nome = row["competencia"]
+                    st.session_state.edit_pais = row["pais"]
+                    st.rerun()
 
-            if col5.button("🗑️ Excluir", key=f"del_{row['id']}"):
-                with engine.begin() as conn:
-                    conn.execute(text("DELETE FROM competicoes WHERE id = :id"), {"id": row["id"]})
-                st.success(f"🗑️ Competição '{row['competencia']}' excluída com sucesso!")
-                st.rerun()
+                if col5.button("🗑️ Excluir", key=f"del_{row['id']}"):
+                    with engine.connect() as conn:
+                        conn.execute(text("DELETE FROM competicoes WHERE id = :id"), {"id": row["id"]})
+                        conn.commit()
+                    st.success(f"🗑️ Competição '{row['competencia']}' removida com sucesso!")
+                    st.rerun()
     else:
         st.info("Nenhuma competição cadastrada ainda.")
 except Exception as e:
