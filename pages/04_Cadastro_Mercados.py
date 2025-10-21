@@ -8,7 +8,9 @@ from sqlalchemy.exc import IntegrityError
 # -----------------------------------------
 st.set_page_config(page_title="Cadastro de Mercados", layout="wide", page_icon="💹")
 
-# Tema claro estilo Seattle Weather com botões compactos e coloridos
+# -----------------------------------------
+# TEMA CLARO + BOTÕES COLORIDOS + TÍTULO AJUSTADO
+# -----------------------------------------
 st.markdown("""
     <style>
         /* Layout geral */
@@ -24,8 +26,13 @@ st.markdown("""
         h1, h2, h3 {
             color: #005B9F;
         }
+        h1 {
+            font-size: 1.7rem !important;  /* título menor */
+            font-weight: 700 !important;
+            margin-bottom: 0.5rem !important;
+        }
 
-        /* Botão padrão (como o de salvar no formulário) */
+        /* Botão padrão (Salvar, Atualizar, etc.) */
         .stButton > button {
             background-color: #007ACC;
             color: white;
@@ -49,33 +56,33 @@ st.markdown("""
             margin-bottom: 10px;
         }
 
-        /* Botões pequenos para ações da lista (Editar / Excluir) */
+        /* Botões pequenos (Editar / Excluir) */
         div[data-testid="stButton"] > button[kind="secondary"],
         div[data-testid="stButton"] > button[kind="primary"] {
-            padding: 0.25em 0.6em;
-            font-size: 0.85em;
-            border-radius: 4px;
-            margin: 0 3px;
-            font-weight: 600;
+            padding: 0.25em 0.6em !important;
+            font-size: 0.8em !important;
+            border-radius: 4px !important;
+            margin: 0 3px !important;
+            font-weight: 600 !important;
         }
 
         /* Editar = Azul */
-        div[data-testid="stButton"] > button:has(span:contains("Editar")) {
+        div[data-testid="stButton"]:has(span:contains("Editar")) > button {
             background-color: #007ACC !important;
             color: white !important;
         }
-        div[data-testid="stButton"] > button:has(span:contains("Editar")):hover {
+        div[data-testid="stButton"]:has(span:contains("Editar")) > button:hover {
             background-color: #005A99 !important;
         }
 
         /* Excluir = Vermelho */
-        div[data-testid="stButton"] > button:has(span:contains("Excluir")),
-        div[data-testid="stButton"] > button:has(span:contains("Remover")) {
+        div[data-testid="stButton"]:has(span:contains("Excluir")) > button,
+        div[data-testid="stButton"]:has(span:contains("Remover")) > button {
             background-color: #D9534F !important;
             color: white !important;
         }
-        div[data-testid="stButton"] > button:has(span:contains("Excluir")):hover,
-        div[data-testid="stButton"] > button:has(span:contains("Remover")):hover {
+        div[data-testid="stButton"]:has(span:contains("Excluir")) > button:hover,
+        div[data-testid="stButton"]:has(span:contains("Remover")) > button:hover {
             background-color: #B52B27 !important;
         }
     </style>
@@ -88,6 +95,9 @@ engine = create_engine(
     "postgresql://neondb_owner:npg_xdZKq5FRT8Wn@ep-dry-wind-adh6ysjv-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 )
 
+# -----------------------------------------
+# TÍTULO E DESCRIÇÃO
+# -----------------------------------------
 st.title("💹 Cadastro de Mercados")
 st.markdown("Gerencie os tipos de mercado usados nas estratégias do MindTrade.")
 
@@ -157,7 +167,7 @@ try:
     if not df.empty:
         for _, row in df.iterrows():
             with st.container():
-                col1, col2, col3, col4 = st.columns([0.5, 3, 3, 1])
+                col1, col2, col3, col4, col5 = st.columns([0.4, 3, 3, 0.8, 0.8])
                 col1.markdown(f"**{row['id']}**")
                 col2.markdown(f"💹 **{row['nome']}**")
                 col3.markdown(f"{row['descricao'] if row['descricao'] else '—'}")
@@ -168,7 +178,7 @@ try:
                     st.session_state.edit_desc = row["descricao"] or ""
                     st.rerun()
 
-                if col4.button("🗑️ Excluir", key=f"del_{row['id']}"):
+                if col5.button("🗑️ Excluir", key=f"del_{row['id']}"):
                     with engine.connect() as conn:
                         conn.execute(text("DELETE FROM mercados WHERE id = :id"), {"id": row["id"]})
                         conn.commit()
