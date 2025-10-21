@@ -1,0 +1,2 @@
+# mindtrade
+Sistema para traders
