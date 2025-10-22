@@ -1,5 +1,14 @@
 import streamlit as st
 
+# --- Sidebar: cabeçalho simples ---
+st.sidebar.image(
+    "https://cdn-icons-png.flaticon.com/512/1484/1484551.png",  # troque se quiser
+    width=56,
+)
+st.sidebar.markdown("<h2 style='margin:0; color:#005B9F;'>MindTrade</h2>", unsafe_allow_html=True)
+st.sidebar.caption("Sistema de operações e análise")
+st.sidebar.markdown("---")
+
 # -----------------------------------------
 # CONFIGURAÇÕES INICIAIS
 # -----------------------------------------
