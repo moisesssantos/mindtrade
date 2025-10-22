@@ -5,6 +5,20 @@ import streamlit as st
 # ------------------------------------------------------
 st.set_page_config(page_title="MindTrade", layout="wide", page_icon="💹")
 
+# --- OCULTAR MENU PADRÃO DO STREAMLIT ---
+st.markdown("""
+    <style>
+        /* Remove o menu lateral padrão */
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+        /* Remove o menu superior "Streamlit" */
+        header {visibility: hidden;}
+        /* Remove o rodapé padrão */
+        footer {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
 # ------------------------------------------------------
 # ESTILO VISUAL DO SIDEBAR
 # ------------------------------------------------------
