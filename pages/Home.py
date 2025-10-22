@@ -21,10 +21,11 @@ st.markdown("""
 <style>
     /* Fundo e estrutura geral da barra lateral */
     section[data-testid="stSidebar"] {
-        background-color: #E6CFF2;           /* fundo lilás */
+        background-color: #E6CFF2;           /* cor personalizada lilás */
         border-right: 1px solid #CDB4DB;
         padding-top: 1.2rem !important;
         width: 250px !important;
+        box-shadow: 2px 0px 8px rgba(0,0,0,0.1);  /* sombra lateral 3D */
     }
 
     /* Títulos das seções */
@@ -37,20 +38,20 @@ st.markdown("""
         letter-spacing: 0.3px;
     }
 
-    /* Links do menu */
+    /* Links do menu (itens de navegação) */
     .stSidebar a, div[data-testid="stSidebar"] a {
         font-weight: 600;
-        color: #4B0082 !important;           /* mesma cor de MindTrade */
+        color: #4B0082 !important;
         display: block;
-        padding: 2px 4px 2px 4px !important;
-        margin: 1px 0 !important;
+        padding: 4px 6px !important;
+        margin: 2px 0 !important;
         text-decoration: none !important;
         border-radius: 4px;
         transition: background-color 0.2s ease, color 0.2s ease;
         font-size: 0.9rem !important;
     }
 
-    /* Hover (passar o mouse) */
+    /* Efeito hover */
     div[data-testid="stSidebar"] a:hover {
         background-color: rgba(75, 0, 130, 0.1);
         color: #4B0082 !important;
@@ -62,7 +63,7 @@ st.markdown("""
         color: #4B0082 !important;
         font-weight: 700 !important;
         border-left: 4px solid #4B0082;
-        padding-left: 6px !important;
+        padding-left: 8px !important;
     }
 
     /* Divisores */
@@ -100,21 +101,21 @@ st.sidebar.markdown("---")
 # ------------------------------------------------------
 # NAVEGAÇÃO LATERAL (ORDENADA POR USO)
 # ------------------------------------------------------
-st.sidebar.markdown("### 🎬 Operações")
-st.sidebar.page_link("pages/06_PreAnalise.py", label="📊 Pré-Análise")
-st.sidebar.page_link("pages/07_Entradas.py", label="💼 Entradas")
+st.sidebar.markdown("### Operações")
+st.sidebar.page_link("pages/06_PreAnalise.py", label="Pré-Análise")
+st.sidebar.page_link("pages/07_Entradas.py", label="Entradas")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 📈 Relatórios")
-st.sidebar.page_link("pages/08_Relatorios.py", label="📊 Relatórios Gerais")
+st.sidebar.markdown("### Relatórios")
+st.sidebar.page_link("pages/08_Relatorios.py", label="Relatórios Gerais")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### ⚙️ Cadastros")
-st.sidebar.page_link("pages/01_Cadastro_Paises.py", label="🌎 Países")
-st.sidebar.page_link("pages/02_Cadastro_Competicoes.py", label="🏆 Competições")
-st.sidebar.page_link("pages/03_Cadastro_Equipes.py", label="⚽ Equipes")
-st.sidebar.page_link("pages/04_Cadastro_Mercados.py", label="💹 Mercados")
-st.sidebar.page_link("pages/05_Cadastro_Estrategias.py", label="🎯 Estratégias")
+st.sidebar.markdown("### Cadastros")
+st.sidebar.page_link("pages/01_Cadastro_Paises.py", label="Países")
+st.sidebar.page_link("pages/02_Cadastro_Competicoes.py", label="Competições")
+st.sidebar.page_link("pages/03_Cadastro_Equipes.py", label="Equipes")
+st.sidebar.page_link("pages/04_Cadastro_Mercados.py", label="Mercados")
+st.sidebar.page_link("pages/05_Cadastro_Estrategias.py", label="Estratégias")
 
 # ------------------------------------------------------
 # RODAPÉ FIXO
