@@ -1,105 +1,111 @@
 import streamlit as st
 
-# --- Sidebar: cabeçalho simples ---
+# ------------------------------------------------------
+# CONFIGURAÇÃO INICIAL
+# ------------------------------------------------------
+st.set_page_config(page_title="MindTrade", layout="wide", page_icon="💹")
+
+# ------------------------------------------------------
+# ESTILO VISUAL DO SIDEBAR
+# ------------------------------------------------------
+st.markdown("""
+<style>
+    section[data-testid="stSidebar"] {
+        background-color: #F8FAFC;           /* fundo suave */
+        border-right: 1px solid #E2E8F0;     /* linha discreta */
+        padding-top: 1.5rem !important;
+    }
+
+    /* Títulos das seções */
+    .sidebar-content h3, .sidebar-content h2 {
+        color: #005B9F !important;
+        margin-top: 1rem !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+    }
+
+    /* Links do menu */
+    [data-testid="stSidebarNav"] a, .stSidebar a, div[data-testid="stSidebar"] a {
+        font-weight: 600;
+        color: #1E293B !important;
+        padding: 4px 0px 4px 2px !important;
+        display: block;
+        text-decoration: none !important;
+    }
+
+    /* Efeito hover */
+    div[data-testid="stSidebar"] a:hover {
+        color: #005B9F !important;
+        background-color: rgba(0,91,159,0.08);
+        border-radius: 4px;
+    }
+
+    /* Divisores */
+    .stSidebar hr {
+        border: 0;
+        border-top: 1px solid #E2E8F0;
+        margin: 0.8rem 0;
+    }
+
+    /* Rodapé fixo */
+    .sidebar-footer {
+        font-size: 0.8rem;
+        color: #64748B;
+        text-align: center;
+        margin-top: 2rem;
+        position: fixed;
+        bottom: 10px;
+        left: 15px;
+        width: 240px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ------------------------------------------------------
+# CABEÇALHO DO MENU LATERAL
+# ------------------------------------------------------
 st.sidebar.image(
-    "https://cdn-icons-png.flaticon.com/512/1484/1484551.png",  # troque se quiser
+    "https://cdn-icons-png.flaticon.com/512/1484/1484551.png",  # pode trocar por um logo seu
     width=56,
 )
 st.sidebar.markdown("<h2 style='margin:0; color:#005B9F;'>MindTrade</h2>", unsafe_allow_html=True)
 st.sidebar.caption("Sistema de operações e análise")
 st.sidebar.markdown("---")
 
-# -----------------------------------------
-# CONFIGURAÇÕES INICIAIS
-# -----------------------------------------
-st.set_page_config(
-    page_title="MindTrade - Início",
-    layout="wide",
-    page_icon="💠",
-    initial_sidebar_state="collapsed"
+# ------------------------------------------------------
+# NAVEGAÇÃO LATERAL (usa os arquivos da pasta pages/)
+# ------------------------------------------------------
+st.sidebar.markdown("### ⚙️ Cadastros")
+st.sidebar.page_link("pages/01_Cadastro_Paises.py", label="🌎 Países")
+st.sidebar.page_link("pages/02_Cadastro_Competicoes.py", label="🏆 Competições")
+st.sidebar.page_link("pages/03_Cadastro_Equipes.py", label="⚽ Equipes")
+st.sidebar.page_link("pages/04_Cadastro_Mercados.py", label="💹 Mercados")
+st.sidebar.page_link("pages/05_Cadastro_Estrategias.py", label="🎯 Estratégias")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🎬 Operações")
+st.sidebar.page_link("pages/06_PreAnalise.py", label="📊 Pré-Análise")
+st.sidebar.page_link("pages/07_Entradas.py", label="💼 Entradas")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📈 Relatórios e Estatísticas")
+st.sidebar.page_link("pages/08_Relatorios.py", label="📊 Relatórios Gerais")
+
+# ------------------------------------------------------
+# RODAPÉ FIXO
+# ------------------------------------------------------
+st.sidebar.markdown(
+    "<div class='sidebar-footer'>Versão 1.0 • © MindTrade<br>Desenvolvido por Moisés Santos</div>",
+    unsafe_allow_html=True
 )
 
-# -----------------------------------------
-# ESTILO VISUAL
-# -----------------------------------------
+# ------------------------------------------------------
+# CONTEÚDO PRINCIPAL DA HOME
+# ------------------------------------------------------
+st.title("💹 Painel MindTrade")
 st.markdown("""
-    <style>
-        body {
-            background-color: #0E1117;
-            color: #FAFAFA;
-        }
-        .stApp {
-            background-color: #0E1117;
-            text-align: center;
-        }
-        h1, h2, h3 {
-            color: #00C0F3;
-            text-align: center;
-        }
-        .menu-card {
-            background-color: #1E222A;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 0px 15px rgba(0,192,243,0.2);
-            transition: 0.3s;
-        }
-        .menu-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0px 0px 25px rgba(0,192,243,0.4);
-        }
-        .stButton > button {
-            background-color: #00C0F3;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0.7em 1.5em;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-top: 15px;
-            transition: 0.2s;
-        }
-        .stButton > button:hover {
-            background-color: #008FB5;
-            transform: scale(1.05);
-        }
-    </style>
-""", unsafe_allow_html=True)
+Bem-vindo ao **MindTrade**, sua plataforma integrada de análise e controle de trading esportivo.  
+Use o menu lateral para navegar entre os módulos de **cadastro**, **operação** e **análise**.
+""")
 
-# -----------------------------------------
-# CONTEÚDO PRINCIPAL
-# -----------------------------------------
-st.title("💠 MindTrade")
-st.subheader("Sistema Integrado de Trading e Análise Profissional")
-
-st.markdown("#### Selecione uma das áreas abaixo para começar:")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown("<div class='menu-card'>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/2382/2382461.png", width=80)
-    st.markdown("### 🌍 Cadastro de Países")
-    st.write("Gerencie os países que participam das competições.")
-    if st.button("Acessar Cadastro"):
-        st.switch_page("pages/01_Cadastro_Paises.py")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("<div class='menu-card'>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/1484/1484551.png", width=80)
-    st.markdown("### 📊 Dashboard (Seattle Weather)")
-    st.write("Acompanhe lucros, greens e reds com visual moderno.")
-    if st.button("Abrir Dashboard"):
-        st.switch_page("mindtrade_test.py")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col3:
-    st.markdown("<div class='menu-card'>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/1284/1284838.png", width=80)
-    st.markdown("### 🧠 Estratégias e Operações")
-    st.write("(Em breve) Central de análises e estratégias automatizadas.")
-    st.button("Em desenvolvimento", disabled=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("---")
-st.caption("💡 MindTrade © 2025 — Sistema completo para traders profissionais.")
+st.info("👉 Dica: comece cadastrando **Países, Competições e Equipes** antes de criar suas estratégias.")
