@@ -24,53 +24,69 @@ st.markdown("""
 # ------------------------------------------------------
 st.markdown("""
 <style>
+    /* Fundo e estrutura geral da barra lateral */
     section[data-testid="stSidebar"] {
-        background-color: #F8FAFC;           /* fundo suave */
-        border-right: 1px solid #E2E8F0;     /* linha discreta */
-        padding-top: 1.5rem !important;
+        background-color: #E6CFF2;           /* cor personalizada */
+        border-right: 1px solid #CDB4DB;     /* borda mais suave */
+        padding-top: 1.2rem !important;
+        width: 250px !important;
     }
 
     /* Títulos das seções */
     .sidebar-content h3, .sidebar-content h2 {
-        color: #005B9F !important;
-        margin-top: 1rem !important;
-        font-size: 1rem !important;
+        color: #4B0082 !important;
+        margin-top: 0.8rem !important;
+        margin-bottom: 0.3rem !important;
+        font-size: 0.95rem !important;
         font-weight: 700 !important;
+        letter-spacing: 0.3px;
     }
 
     /* Links do menu */
-    [data-testid="stSidebarNav"] a, .stSidebar a, div[data-testid="stSidebar"] a {
+    .stSidebar a, div[data-testid="stSidebar"] a {
         font-weight: 600;
-        color: #1E293B !important;
-        padding: 4px 0px 4px 2px !important;
+        color: #1E1E2F !important;
         display: block;
+        padding: 2px 4px 2px 4px !important;
+        margin: 2px 0 !important;
         text-decoration: none !important;
+        border-radius: 4px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        font-size: 0.9rem !important;
     }
 
-    /* Efeito hover */
+    /* Hover (passar o mouse) */
     div[data-testid="stSidebar"] a:hover {
-        color: #005B9F !important;
-        background-color: rgba(0,91,159,0.08);
-        border-radius: 4px;
+        background-color: rgba(0, 91, 159, 0.1);
+        color: #003366 !important;
+    }
+
+    /* Indicador da página ativa */
+    div[data-testid="stSidebar"] a[data-testid="stPageLink-true"] {
+        background-color: rgba(0, 91, 159, 0.15);
+        color: #003366 !important;
+        font-weight: 700 !important;
+        border-left: 4px solid #005B9F;
+        padding-left: 6px !important;
     }
 
     /* Divisores */
     .stSidebar hr {
         border: 0;
-        border-top: 1px solid #E2E8F0;
-        margin: 0.8rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin: 0.6rem 0;
     }
 
     /* Rodapé fixo */
     .sidebar-footer {
         font-size: 0.8rem;
-        color: #64748B;
+        color: #3C3C4A;
         text-align: center;
-        margin-top: 2rem;
+        margin-top: 1.8rem;
         position: fixed;
         bottom: 10px;
         left: 15px;
-        width: 240px;
+        width: 230px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -80,9 +96,9 @@ st.markdown("""
 # ------------------------------------------------------
 st.sidebar.image(
     "https://cdn-icons-png.flaticon.com/512/1484/1484551.png",  # pode trocar por um logo seu
-    width=56,
+    width=52,
 )
-st.sidebar.markdown("<h2 style='margin:0; color:#005B9F;'>MindTrade</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='margin:0; color:#4B0082;'>MindTrade</h2>", unsafe_allow_html=True)
 st.sidebar.caption("Sistema de operações e análise")
 st.sidebar.markdown("---")
 
