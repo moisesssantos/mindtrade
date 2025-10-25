@@ -1,6 +1,10 @@
 import { Client } from "pg";
 
-export default async function handler(req, res) {
+export const config = {
+  runtime: "edge",
+};
+
+export default async function handler(req) {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
@@ -10,44 +14,57 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      // Busca dinâmica opcional: /api/equipes?busca=botafogo
-      const { busca } = req.query;
+      const { searchParams } = new URL(req.url);
+      const busca = searchParams.get("busca");
       const query = busca
         ? `SELECT * FROM equipes WHERE nome ILIKE $1 ORDER BY nome ASC`
         : `SELECT * FROM equipes ORDER BY nome ASC`;
       const values = busca ? [`%${busca}%`] : [];
       const result = await client.query(query, values);
-      res.status(200).json(result.rows);
+      return new Response(JSON.stringify(result.rows), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    else if (req.method === "POST") {
-      const { nome } = req.body;
+    if (req.method === "POST") {
+      const body = await req.json();
+      const { nome } = body;
       if (!nome) {
-        return res.status(400).json({ error: "O campo 'nome' é obrigatório." });
+        return new Response(
+          JSON.stringify({ error: "O campo 'nome' é obrigatório." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
       }
 
-      // Insere apenas se não existir
       const check = await client.query(
         "SELECT 1 FROM equipes WHERE nome ILIKE $1",
         [nome]
       );
       if (check.rowCount > 0) {
-        return res
-          .status(409)
-          .json({ error: "Já existe uma equipe com esse nome." });
+        return new Response(
+          JSON.stringify({ error: "Já existe uma equipe com esse nome." }),
+          { status: 409, headers: { "Content-Type": "application/json" } }
+        );
       }
 
       await client.query("INSERT INTO equipes (nome) VALUES ($1)", [nome]);
-      res.status(201).json({ message: "Equipe cadastrada com sucesso!" });
+      return new Response(
+        JSON.stringify({ message: "Equipe cadastrada com sucesso!" }),
+        { status: 201, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    else {
-      res.setHeader("Allow", ["GET", "POST"]);
-      res.status(405).end(`Método ${req.method} não permitido`);
-    }
+    return new Response(
+      JSON.stringify({ error: `Método ${req.method} não permitido` }),
+      { status: 405, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erro interno no servidor." });
+    return new Response(
+      JSON.stringify({ error: "Erro interno no servidor." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   } finally {
     await client.end();
   }
