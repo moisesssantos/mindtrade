@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: mindtrade
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "streamlit run app.py --server.port 10000"
+    envVars:
+      - key: DATABASE_URL
+        value: "postgresql://neondb_owner:npg_GeVNuRtyUX38@ep-restless-cherry-a42oxef0-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
